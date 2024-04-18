@@ -7,6 +7,8 @@ fi
 _dc() {
     COMPREPLY=();
 
+    local list=("--help" "--new" "-n" "--remove" "-r" "--list" "-l")
+
     if declare -F _init_completion >/dev/null 2>&1; then
         _init_completion -n =: || return
     else
@@ -26,11 +28,12 @@ _dc() {
     if [ $cword == 1 ]; then
         if [ "${cur:0:1}" != "-" ]; then
             COMPREPLY=($(compgen -W "$(dc -l)" -- "${cur}"))
-        else 
-            local list=("--help" "--new" "-n" "--remove" "-r" "--list" "-l")
+        else
             COMPREPLY=($(compgen -W "${list[*]}" -- "${cur}"))
         fi
-    else 
+    elif [[ " ${list[*]} " =~ [[:space:]]${prev}[[:space:]] ]]; then
+         _cd
+    else
         words=("${words[@]}" "-f" "$HOME/.config/dc/yml/${rwords[1]}" "${rwords[@]:2:${#rwords[@]}}")
         __docker_debug "words:" ${words[@]}
         cword=$(($cword + 2))
